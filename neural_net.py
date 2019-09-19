@@ -16,7 +16,7 @@ class NeuralNet:
         for layer in self.layers:
             prev_out_node = nodes[-1]
 
-            def weights_func(w):  # Python is stupid
+            def weights_func(w):
                 return lambda _: w
             weight_node = Node(weights_func(layer.weights), None, (layer.output_dimension(), layer.input_dimension()))
             nodes.append(weight_node)
@@ -33,7 +33,7 @@ class NeuralNet:
             matmul_node = Node(matmul, matmul_grad, (layer.output_dimension(), 1))
             nodes.append(matmul_node)
 
-            def bias_func(b):  # again, stupid af
+            def bias_func(b):
                 return lambda _: b
             bias_node = Node(bias_func(layer.biases), None, (layer.output_dimension(), 1))
             nodes.append(bias_node)
