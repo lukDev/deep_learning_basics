@@ -4,7 +4,7 @@ import numpy as np
 
 def order_3_reg_1x1():
     def original_func(x):
-        a3 = np.array([[-1.73]])
+        a3 = np.array([[-1.74]])
         a2 = np.array([[2.902]])
         a1 = np.array([[20.34]])
         a0 = np.array([[3.0001]])
