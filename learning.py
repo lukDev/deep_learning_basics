@@ -27,7 +27,7 @@ def get_data(original_func, lb, ub, size):
 
 def get_nn_from_architecture(layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation):
     weights = [np.random.uniform(-1., 1., layer_dimension[::-1]) for layer_dimension in layer_dimensions]  # dimension is reversed because a R^n -> R^m function needs a m x n matrix
-    biases = [np.random.uniform(-0.1, .1, (layer_dimension[1], 1)) for layer_dimension in layer_dimensions]
+    biases = [np.random.uniform(-0.1, 0.1, (layer_dimension[1], 1)) for layer_dimension in layer_dimensions]
 
     layers = [Layer(weights[i], biases[i], hidden_act, hidden_act_der) for i in range(len(layer_dimensions) - 1)]
     layers.append(Layer(weights[-1], biases[-1], output_act, output_act_der))
@@ -87,11 +87,11 @@ def test_regression_1x1(nn, func, t_size, d_lb, d_ub):
 
 def classification_1x1(lb, ub, d_size, learning_rate, layer_dimensions, original_func, out_interpretation):
     def hidden_act(x):
-        return np.array([[np.tanh(xv) for xv in xs] for xs in x])
+        return np.array([[max(0, xv) for xv in xs] for xs in x])
 
     def hidden_act_der(x):
         def der(x):
-            return 1. - np.power(np.tanh(x), 2)
+            return 1. if x > 0. else 0.
 
         return np.array([[der(xv) for xv in xs] for xs in x])
 

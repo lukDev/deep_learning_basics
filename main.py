@@ -16,11 +16,11 @@ def order_3_reg_1x1():
 
     layer_dimensions = [(1, 45), (45, 45), (45, 1)]
 
-    regression_1x1(-5., 5., 100000, 0.0001, layer_dimensions, original_func, out_interpretation)
+    regression_1x1(-5., 5., 50000, 0.0001, layer_dimensions, original_func, out_interpretation)
 
 
 def cat_3_1x1():
-    categories = np.array([1, 2, 3])
+    categories = np.array([5, 10, 15])
 
     def original_func(x):
         [[x_inner]] = x
@@ -36,9 +36,9 @@ def cat_3_1x1():
         max_i = np.argmax(x)
         return categories[max_i]
 
-    layer_dimensions = [(1, 50), (50, 50), (50, 3)]
+    layer_dimensions = [(1, 2), (2, 2), (2, 4), (4, 3)]
 
-    classification_1x1(-1., 1., 10000, 0.01, layer_dimensions, original_func, out_interpretation)
+    classification_1x1(-0.3333, 1., 1000, 0.001, layer_dimensions, original_func, out_interpretation)
 
 
 order_3_reg_1x1()
