@@ -19,26 +19,26 @@ def order_3_reg_1x1():
     regression_1x1(-5., 5., 20000, 0.0001, layer_dimensions, original_func, out_interpretation)
 
 
-def cat_3_1x1():
-    categories = np.array([0, 1, 2])
+def cat_1x1():
+    categories = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    lb = -5.
+    ub = 5.
 
     def original_func(x):
         [[x_inner]] = x
-        if x_inner < -0.3333:
-            return [1, 0, 0]
-        elif -0.3333 <= x_inner < 0.3333:
-            return [0, 1, 0]
-        else:
-            return [0, 0, 1]
+        res = np.full((10,), 0)
+        i = int((x_inner - lb) / (ub - lb) * 10)
+        res[i] = 1
+        return res
 
     def out_interpretation(x):
         x = x.reshape((x.shape[0]))
         max_i = np.argmax(x)
         return categories[max_i]
 
-    layer_dimensions = [(1, 30), (30, 3)]
+    layer_dimensions = [(1, 70), (70, 70), (70, 10)]
 
-    classification_1x1(-1., 1., 5000, 0.001, layer_dimensions, original_func, out_interpretation)
+    classification_1x1(lb, ub, 30000, 0.001, layer_dimensions, original_func, out_interpretation)
 
 
-cat_3_1x1()
+cat_1x1()
