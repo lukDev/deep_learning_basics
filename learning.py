@@ -25,7 +25,17 @@ def get_data(original_func, lb, ub, size):
     return xs, ys
 
 
-def regression_1x1(lb, ub, d_size, learning_rate, original_func, out_interpretation):
+def get_nn_from_architecture(layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation):
+    weights = [np.random.uniform(-1., 1., layer_dimension[::-1]) for layer_dimension in layer_dimensions]  # dimension is reversed because a R^n -> R^m function needs a m x n matrix
+    biases = [np.random.uniform(-0.1, .1, (layer_dimension[1], 1)) for layer_dimension in layer_dimensions]
+
+    layers = [Layer(weights[i], biases[i], hidden_act, hidden_act_der) for i in range(len(layer_dimensions) - 1)]
+    layers.append(Layer(weights[-1], biases[-1], output_act, output_act_der))
+
+    return NeuralNet(layers, loss, loss_der, out_interpretation)
+
+
+def regression_1x1(lb, ub, d_size, learning_rate, layer_dimensions, original_func, out_interpretation):
     def loss(y_head, y):
         return 0.5 * np.power(np.linalg.norm(np.subtract(y_head, y)), 2)
 
@@ -46,26 +56,12 @@ def regression_1x1(lb, ub, d_size, learning_rate, original_func, out_interpretat
     def output_act_der(x):
         return np.ones(x.shape)
 
-    nn = learn_regression_1x1(original_func, d_size, lb, ub, learning_rate, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation)
+    nn = learn_regression_1x1(original_func, d_size, lb, ub, learning_rate, layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation)
     test_regression_1x1(nn, original_func, 100, lb, ub)
 
 
-def learn_regression_1x1(func, d_size, d_lb, d_ub, learning_rate, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation):
-    dim = 45
-
-    w1 = np.random.uniform(-1., 1., (dim, 1))
-    w2 = np.random.uniform(-1., 1., (dim, dim))
-    w3 = np.random.uniform(-1., 1., (1, dim))
-
-    b1 = np.random.uniform(-0.1, .1, (dim, 1))
-    b2 = np.random.uniform(-0.1, .1, (dim, 1))
-    b3 = np.random.uniform(-0.1, .1, (1, 1))
-
-    l1 = Layer(w1, b1, hidden_act, hidden_act_der)
-    l2 = Layer(w2, b2, hidden_act, hidden_act_der)
-    l3 = Layer(w3, b3, output_act, output_act_der)
-
-    nn = NeuralNet([l1, l2, l3], loss, loss_der, out_interpretation)
+def learn_regression_1x1(func, d_size, d_lb, d_ub, learning_rate, layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation):
+    nn = get_nn_from_architecture(layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation)
 
     (ds_xs, ds_ys) = get_data(func, d_lb, d_ub, (d_size, 1, 1))
     d_xs = np.array([np.array(x).reshape(1, 1) for x in ds_xs])
@@ -89,7 +85,7 @@ def test_regression_1x1(nn, func, t_size, d_lb, d_ub):
     plt.show()
 
 
-def classification_1x1(lb, ub, d_size, learning_rate, original_func, out_interpretation):
+def classification_1x1(lb, ub, d_size, learning_rate, layer_dimensions, original_func, out_interpretation):
     def hidden_act(x):
         return np.array([[np.tanh(xv) for xv in xs] for xs in x])
 
@@ -126,27 +122,12 @@ def classification_1x1(lb, ub, d_size, learning_rate, original_func, out_interpr
 
         return der.reshape((y_head.shape[0], 1))
 
-    nn = learn_classification_1x1(original_func, d_size, lb, ub, learning_rate, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation)
+    nn = learn_classification_1x1(original_func, d_size, lb, ub, learning_rate, layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation)
     test_classification_1x1(nn, original_func, 100, lb, ub, out_interpretation)
 
 
-def learn_classification_1x1(original_func, d_size, d_lb, d_ub, learning_rate, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation):
-    w1 = np.random.uniform(0.8, 1.2, (10, 1))
-    w2 = np.random.uniform(0.8, 1.2, (10, 10))
-    w3 = np.random.uniform(0.8, 1.2, (10, 10))
-    w4 = np.random.uniform(0.8, 1.2, (3, 10))
-
-    b1 = np.random.uniform(0., .2, (10, 1))
-    b2 = np.random.uniform(0., .2, (10, 1))
-    b3 = np.random.uniform(0., .2, (10, 1))
-    b4 = np.full((3, 1), .1)
-
-    l1 = Layer(w1, b1, hidden_act, hidden_act_der)
-    l2 = Layer(w2, b2, hidden_act, hidden_act_der)
-    l3 = Layer(w3, b3, hidden_act, hidden_act_der)
-    l4 = Layer(w4, b4, output_act, output_act_der)
-
-    nn = NeuralNet([l1, l2, l3, l4], loss, loss_der, out_interpretation)
+def learn_classification_1x1(original_func, d_size, d_lb, d_ub, learning_rate, layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation):
+    nn = get_nn_from_architecture(layer_dimensions, loss, loss_der, hidden_act, hidden_act_der, output_act, output_act_der, out_interpretation)
 
     (ds_xs, ds_ys) = get_data(original_func, d_lb, d_ub, (d_size, 1, 1))
     d_xs = np.array([np.array(x).reshape(1, 1) for x in ds_xs])
