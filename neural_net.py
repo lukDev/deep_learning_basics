@@ -60,7 +60,7 @@ class NeuralNet:
                     prev_result = prev_activations[0]
                     derived_acts = act_der(prev_result)
                     new_grad = np.multiply(forward_grad, derived_acts)
-                    return [new_grad]
+                    return (new_grad,)
 
                 return activation_der
 

@@ -20,7 +20,7 @@ def order_3_reg_1x1():
 
 
 def cat_1x1():
-    categories = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    categories = np.array([5, 3, 6, 2, 1, 9, 8, 0, 4, 7])
     lb = -5.
     ub = 5.
 
